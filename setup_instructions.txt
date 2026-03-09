@@ -1,0 +1,85 @@
+To get the Echo Manager application running smoothly on your machine, you will need to install the following dependencies and tools:
+
+=====================================
+Prerequisites (System Level)
+=====================================
+Before running the project, you must have these installed on your machine:
+1. Node.js (v18+ recommended) - For running both the backend server and frontend development environment.
+    Download: https://nodejs.org/
+2. MySQL - The database system used by the backend.
+    Download: https://www.mysql.com/
+
+=====================================
+Backend Dependencies (backend folder)
+=====================================
+Navigate into the backend folder (`cd backend`) and run `npm install` to get these:
+
+Core Dependencies:
+- express (v5.2.1) - Web framework.
+- mysql2 (v3.17.2) - MySQL database driver.
+- sequelize (v6.37.7) - ORM for database interactions.
+- bcryptjs (v3.0.3) - For hashing passwords.
+- jsonwebtoken (v9.0.3) - For JWT authentication.
+- socket.io (v4.8.3) - True real-time bi-directional communication.
+- cors (v2.8.6) - Cross-Origin Resource Sharing.
+- dotenv (v17.3.1) - For loading environment variables.
+- multer (v2.0.2) & fs-extra (v11.3.3) - For handling file uploads and filesystem interactions.
+
+Dev Dependencies (Optional but good for dev):
+- nodemon
+- sequelize-cli
+
+=====================================
+Frontend Dependencies (frontend folder)
+=====================================
+Navigate into the frontend folder (`cd frontend`) and run `npm install` to get these:
+
+Core Libraries:
+- react & react-dom (v19.2.0) - The UI library.
+- react-router-dom (v7.13.0) - For page routing.
+- vite - The build tool and dev server.
+- axios - For making HTTP requests to the backend.
+- socket.io-client - For frontend real-time connections.
+- zustand - For state management.
+
+UI & Styling:
+- tailwindcss (v4.x) - For styling.
+- @radix-ui/react-* components & shadcn-ui - The base accessible UI components.
+- lucide-react - For icons.
+- next-themes - For dark/light mode switching.
+- sonner - For toast notifications.
+- recharts - For rendering the charts on the dashboard.
+- @tanstack/react-table - For complex tables.
+
+Forms & Utilities:
+- date-fns & react-day-picker - Date formatting and pickers.
+- react-hook-form & zod - Form handling and schema validation.
+- @hello-pangea/dnd - Drag and drop functionality.
+- react-dropzone - For file upload areas.
+- jspdf & jspdf-autotable - For generating PDF invoices/reports.
+
+=====================================
+Quick Start Guide
+=====================================
+Run these exact commands in your terminal after cloning the code:
+
+1. Setup Database: 
+   Ensure MySQL is running and create a database schema for the project.
+
+2. Environment Variables: 
+   Create a `.env` file in the `backend` folder matching your local variables (DB credentials, JWT secrets, etc.).
+
+3. Install & Run Backend:
+   cd backend
+   npm install
+   npm run dev
+
+4. Install & Run Frontend (in a new terminal tab):
+   cd frontend
+   npm install
+   npm run dev
+
+5. Default Admin Account:
+   The backend will automatically create a default admin account the first time it connects to the database. You can log in using:
+   - Email: Admin@gmail.com
+   - Password: admin123

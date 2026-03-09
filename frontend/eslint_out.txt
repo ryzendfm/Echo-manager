@@ -1,0 +1,8 @@
+
+E:\Echo Digitals\Projects\Echo Manger\frontend\src\components\employees\EmployeeList.jsx
+  173:18  error  'err' is defined but never used  no-unused-vars
+  231:18  error  'err' is defined but never used  no-unused-vars
+  239:18  error  'err' is defined but never used  no-unused-vars
+
+✖ 3 problems (3 errors, 0 warnings)
+
