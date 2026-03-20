@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {
     getMyNotifications,
+    getByUserId,
     getUnreadCount,
     markAsRead,
     markAllAsRead,
@@ -10,6 +11,7 @@ const {
 } = require('../controllers/notificationController');
 const auth = require('../middleware/auth');
 
+router.get('/by-user/:userId', auth, getByUserId);
 router.get('/', auth, getMyNotifications);
 router.get('/unread-count', auth, getUnreadCount);
 router.patch('/read-all', auth, markAllAsRead);

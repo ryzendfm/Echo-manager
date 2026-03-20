@@ -42,7 +42,7 @@ exports.getAll = async (req, res) => {
         const employees = await Employee.findAll({ order: [['created_at', 'DESC']] });
         // Enrich with user data
         const enriched = (await Promise.all(employees.map(async (emp) => {
-            const user = await User.findByPk(emp.user_id, { attributes: ['first_name', 'last_name', 'email', 'avatar', 'role'] });
+            const user = await User.findByPk(emp.user_id, { attributes: ['first_name', 'last_name', 'email', 'phone', 'avatar', 'role'] });
             if (user && !['employee', 'intern'].includes(user.role)) return null;
             return { ...emp.toJSON(), user: user ? user.toJSON() : null };
         }))).filter(Boolean);

@@ -47,6 +47,37 @@ exports.getMyNotifications = async (req, res) => {
     }
 };
 
+// GET /notifications/by-user/:userId — admin: get notifications for a specific user
+exports.getByUserId = async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 20;
+        const offset = (page - 1) * limit;
+
+        const { count, rows } = await Notification.findAndCountAll({
+            where: { recipient_id: req.params.userId },
+            order: [['created_at', 'DESC']],
+            limit,
+            offset,
+            include: [{
+                model: User,
+                as: 'sender',
+                attributes: ['id', 'first_name', 'last_name', 'avatar', 'role'],
+                required: false,
+            }],
+        });
+
+        res.json({
+            success: true,
+            notifications: rows,
+            pagination: { page, limit, total: count, totalPages: Math.ceil(count / limit) },
+        });
+    } catch (error) {
+        console.error('Get User Notifications Error:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+};
+
 // GET /notifications/unread-count
 exports.getUnreadCount = async (req, res) => {
     try {

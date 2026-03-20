@@ -1,7 +1,9 @@
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const Client = require('../models/Client');
 const User = require('../models/User');
 const sequelize = require('../config/db');
+const { sendPortalInvite } = require('../utils/emailService');
 
 const requireRole = (req, res, roles) => {
     const role = req.user && req.user.role;
@@ -64,38 +66,52 @@ const buildPortalPayload = (body) => {
 const createClientUser = async ({ client, contact, portal, transaction }) => {
     if (!portal.enabled) return null;
 
-    if (!portal.password || portal.password.length < 6) {
-        throw new Error('Password must be at least 6 characters');
-    }
-    if (portal.password !== portal.confirm_password) {
-        throw new Error('Passwords do not match');
+    const email = contact.email || contact.contact_email;
+    if (!email) {
+        throw new Error('Client email is required for portal access');
     }
 
     const existing = await User.findOne({
-        where: { email: contact.email },
+        where: { email },
         transaction,
     });
     if (existing) {
         throw new Error('Email already exists');
     }
 
+    // Generate a random placeholder password (user will set their own via email link)
+    const placeholderPassword = crypto.randomBytes(32).toString('hex');
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(portal.password, salt);
-    const count = await User.count({ transaction });
+    const hashedPassword = await bcrypt.hash(placeholderPassword, salt);
+    const maxIdResult = await User.max('id', { transaction });
+    const nextId = (maxIdResult || 0) + 1;
 
     const firstName = contact.first_name || contact.firstName || contact.name || client.company_name;
     const lastName = contact.last_name || contact.lastName || '';
 
+    // Generate set-password token (24h expiry)
+    const rawToken = crypto.randomBytes(32).toString('hex');
+    const hashedToken = crypto.createHash('sha256').update(rawToken).digest('hex');
+
     const user = await User.create({
-        user_uid: `USR-${String(count + 1).padStart(3, '0')}`,
+        user_uid: `USR-${String(nextId).padStart(3, '0')}`,
         first_name: firstName,
         last_name: lastName || 'Client',
-        email: contact.email,
+        email,
         role: 'client',
         client_id: client.id,
         password: hashedPassword,
-        is_active: true,
+        is_active: false,
+        password_reset_token: hashedToken,
+        password_reset_expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
     }, { transaction });
+
+    // Send invite email (non-blocking — don't fail the transaction if email fails)
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const setPasswordUrl = `${frontendUrl}/set-password?token=${rawToken}`;
+    sendPortalInvite(email, firstName, setPasswordUrl).catch((err) => {
+        console.error('Failed to send portal invite email:', err);
+    });
 
     return user;
 };

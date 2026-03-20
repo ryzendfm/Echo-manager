@@ -223,6 +223,43 @@ exports.resetPassword = async (req, res) => {
     }
 };
 
+exports.setPassword = async (req, res) => {
+    const { token, password } = req.body;
+
+    try {
+        if (!token) {
+            return res.status(400).json({ success: false, message: 'Token is required' });
+        }
+        if (!password || password.length < 6) {
+            return res.status(400).json({ success: false, message: 'Password must be at least 6 characters' });
+        }
+
+        const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+        const user = await User.findOne({
+            where: {
+                password_reset_token: hashedToken,
+                password_reset_expires: { [Op.gt]: new Date() },
+            },
+        });
+
+        if (!user) {
+            return res.status(400).json({ success: false, message: 'Invalid or expired link. Please contact your administrator.' });
+        }
+
+        user.password = await bcrypt.hash(password, 10);
+        user.password_reset_token = null;
+        user.password_reset_expires = null;
+        user.is_active = true;
+        await user.save();
+
+        res.json({ success: true, message: 'Password set successfully. You can now sign in.' });
+    } catch (error) {
+        console.error('Set Password Error:', error);
+        res.status(500).json({ success: false, message: 'Failed to set password' });
+    }
+};
+
 exports.getMe = async (req, res) => {
     try {
         const user = await User.findByPk(req.user.id, {

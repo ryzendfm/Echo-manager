@@ -137,6 +137,31 @@ exports.getMyAttendance = async (req, res) => {
     }
 };
 
+// GET /attendance/by-employee/:employeeId — admin: get attendance for a specific employee
+exports.getByEmployee = async (req, res) => {
+    try {
+        await autoCheckoutExpired();
+        const { month, year } = req.query;
+        const where = { employee_id: req.params.employeeId };
+
+        if (month && year) {
+            const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
+            const endDate = new Date(year, month, 0).toISOString().split('T')[0];
+            where.date = { [Op.between]: [startDate, endDate] };
+        }
+
+        const records = await Attendance.findAll({
+            where,
+            order: [['date', 'DESC']],
+        });
+
+        res.json({ success: true, attendance: records });
+    } catch (error) {
+        console.error('Get Employee Attendance Error:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+};
+
 exports.getAll = async (req, res) => {
     try {
         await autoCheckoutExpired();
