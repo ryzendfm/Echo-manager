@@ -49,7 +49,7 @@ export default function LoginForm() {
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
                 <FormField
                     control={form.control}
                     name="email"
@@ -73,7 +73,7 @@ export default function LoginForm() {
                                 <div className="relative">
                                     <Input
                                         type={showPassword ? "text" : "password"}
-                                        placeholder="••••••••"
+                                        placeholder="Enter your password"
                                         {...field}
                                     />
                                     <Button
@@ -98,7 +98,7 @@ export default function LoginForm() {
                 <div className="flex justify-end">
                     <Link
                         to="/forgot-password"
-                        className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+                        className="text-sm font-medium text-purple-400 underline-offset-4 hover:underline hover:text-purple-300"
                     >
                         Forgot password?
                     </Link>

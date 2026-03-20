@@ -12,4 +12,6 @@ export const attendanceApi = {
     getByDate: (date) => api.get("/attendance/by-date", { params: { date } }),
     getMonthlyOverview: (params) =>
         api.get("/attendance/monthly-overview", { params }),
+    getByEmployee: (employeeId, params) =>
+        api.get(`/attendance/by-employee/${employeeId}`, { params }),
 };

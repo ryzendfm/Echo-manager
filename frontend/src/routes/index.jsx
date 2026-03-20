@@ -4,6 +4,7 @@ import AuthLayout from "@/components/layouts/AuthLayout";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 import Login from "@/pages/auth/Login";
 import ForgotPassword from "@/pages/auth/ForgotPassword";
+import SetPassword from "@/pages/auth/SetPassword";
 import AdminDashboard from "@/pages/admin/Dashboard";
 import EmployeeDashboard from "@/pages/employee/Dashboard";
 import ClientDashboard from "@/pages/client/Dashboard";
@@ -39,6 +40,7 @@ export default function AppRoutes() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
             </Route>
+            <Route path="/set-password" element={<SetPassword />} />
 
             {/* Admin Routes */}
             <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>

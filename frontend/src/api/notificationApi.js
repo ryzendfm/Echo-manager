@@ -7,4 +7,5 @@ export const notificationApi = {
     markAllAsRead: () => api.patch("/notifications/read-all"),
     send: (data) => api.post("/notifications/send", data),
     delete: (id) => api.delete(`/notifications/${id}`),
+    getByUserId: (userId, params) => api.get(`/notifications/by-user/${userId}`, { params }),
 };

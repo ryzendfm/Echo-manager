@@ -4,8 +4,8 @@ import { Slot } from "@radix-ui/react-slot"
 import { cva } from "class-variance-authority";
 import { PanelLeft } from "lucide-react"
 
-import { useIsMobile } from "@/components/hooks/use-mobile"
-import { cn } from "@/components/lib/utils"
+import { useIsMobile } from "@/hooks/use-mobile"
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
@@ -28,7 +28,7 @@ const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
 const SIDEBAR_WIDTH = "16rem"
 const SIDEBAR_WIDTH_MOBILE = "18rem"
-const SIDEBAR_WIDTH_ICON = "3rem"
+const SIDEBAR_WIDTH_ICON = "4.5rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 
 const SidebarContext = React.createContext(null)
@@ -185,40 +185,72 @@ const Sidebar = React.forwardRef((
     );
   }
 
+  const isCollapsed = state === "collapsed"
+  const isIcon = collapsible === "icon"
+  const isOffcanvas = collapsible === "offcanvas"
+  const isFloatingOrInset = variant === "floating" || variant === "inset"
+
+  // Compute the spacer width
+  let spacerWidth = SIDEBAR_WIDTH
+  if (isCollapsed && isOffcanvas) {
+    spacerWidth = "0px"
+  } else if (isCollapsed && isIcon) {
+    spacerWidth = isFloatingOrInset
+      ? `calc(${SIDEBAR_WIDTH_ICON} + 1rem)`
+      : SIDEBAR_WIDTH_ICON
+  }
+
+  // Compute the fixed panel width
+  let panelWidth = SIDEBAR_WIDTH
+  if (isCollapsed && isIcon) {
+    panelWidth = isFloatingOrInset
+      ? `calc(${SIDEBAR_WIDTH_ICON} + 1rem + 2px)`
+      : SIDEBAR_WIDTH_ICON
+  }
+
+  // Compute left/right offset for offcanvas
+  let panelOffset = "0px"
+  if (isCollapsed && isOffcanvas) {
+    panelOffset = `calc(${SIDEBAR_WIDTH} * -1)`
+  }
+
   return (
     <div
       ref={ref}
       className="group peer hidden text-sidebar-foreground md:block"
       data-state={state}
-      data-collapsible={state === "collapsed" ? collapsible : ""}
+      data-collapsible={isCollapsed ? collapsible : ""}
       data-variant={variant}
       data-side={side}>
       {/* This is what handles the sidebar gap on desktop */}
       <div
         className={cn(
-          "relative w-[--sidebar-width] bg-transparent transition-[width] duration-200 ease-linear",
-          "group-data-[collapsible=offcanvas]:w-0",
-          "group-data-[side=right]:rotate-180",
-          variant === "floating" || variant === "inset"
-            ? "group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4))]"
-            : "group-data-[collapsible=icon]:w-[--sidebar-width-icon]"
-        )} />
+          "relative bg-transparent transition-[width] duration-200 ease-linear",
+          side === "right" && "rotate-180"
+        )}
+        style={{ width: spacerWidth }} />
       <div
         className={cn(
-          "fixed inset-y-0 z-10 hidden h-svh w-[--sidebar-width] transition-[left,right,width] duration-200 ease-linear md:flex",
-          side === "left"
-            ? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
-            : "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
-          // Adjust the padding for floating and inset variants.
-          variant === "floating" || variant === "inset"
-            ? "p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4)_+2px)]"
-            : "group-data-[collapsible=icon]:w-[--sidebar-width-icon] group-data-[side=left]:border-r group-data-[side=right]:border-l",
+          "fixed inset-y-0 z-10 hidden h-svh transition-[left,right,width] duration-200 ease-linear md:flex",
+          isFloatingOrInset
+            ? "p-2"
+            : cn(
+              side === "left" && "border-r",
+              side === "right" && "border-l"
+            ),
           className
         )}
+        style={{
+          width: panelWidth,
+          ...(side === "left" ? { left: panelOffset } : { right: panelOffset }),
+        }}
         {...props}>
         <div
           data-sidebar="sidebar"
-          className="flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow">
+          className={cn(
+            "flex h-full w-full flex-col bg-sidebar",
+            isFloatingOrInset && "rounded-lg border border-sidebar-border shadow"
+          )}>
           {children}
         </div>
       </div>
@@ -307,7 +339,7 @@ const SidebarHeader = React.forwardRef(({ className, ...props }, ref) => {
     <div
       ref={ref}
       data-sidebar="header"
-      className={cn("flex flex-col gap-2 p-2", className)}
+      className={cn("flex flex-col gap-2 p-2 group-data-[collapsible=icon]:items-center", className)}
       {...props} />
   );
 })
@@ -318,7 +350,7 @@ const SidebarFooter = React.forwardRef(({ className, ...props }, ref) => {
     <div
       ref={ref}
       data-sidebar="footer"
-      className={cn("flex flex-col gap-2 p-2", className)}
+      className={cn("flex flex-col gap-2 p-2 group-data-[collapsible=icon]:items-center", className)}
       {...props} />
   );
 })
@@ -354,7 +386,7 @@ const SidebarGroup = React.forwardRef(({ className, ...props }, ref) => {
     <div
       ref={ref}
       data-sidebar="group"
-      className={cn("relative flex w-full min-w-0 flex-col p-2", className)}
+      className={cn("relative flex w-full min-w-0 flex-col p-2 group-data-[collapsible=icon]:items-center", className)}
       {...props} />
   );
 })
@@ -509,7 +541,7 @@ const SidebarMenuAction = React.forwardRef(({ className, asChild = false, showOn
         "peer-data-[size=lg]/menu-button:top-2.5",
         "group-data-[collapsible=icon]:hidden",
         showOnHover &&
-          "group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 peer-data-[active=true]/menu-button:text-sidebar-accent-foreground md:opacity-0",
+        "group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 peer-data-[active=true]/menu-button:text-sidebar-accent-foreground md:opacity-0",
         className
       )}
       {...props} />

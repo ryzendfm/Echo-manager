@@ -33,7 +33,7 @@ const DialogContent = React.forwardRef(({ className, children, ...props }, ref) 
       className={cn(
         // Mobile: full-screen sheet from bottom
         "fixed z-50 grid w-full gap-4 border bg-background p-6 shadow-lg duration-200",
-        "inset-0 max-h-[100dvh] overflow-y-auto",
+        "inset-0 max-h-[100dvh] overflow-y-auto styled-scrollbar",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
         "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",

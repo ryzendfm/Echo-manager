@@ -22,9 +22,11 @@ import { clientApi } from "@/api/clientApi";
 import { employeeApi } from "@/api/employeeApi";
 import { invoiceApi } from "@/api/invoiceApi";
 import { toast } from "sonner";
+import { useCelebration } from "@/hooks/useCelebration";
 import ProjectDetailDialog from "./ProjectDetailDialog";
 
 export default function ProjectList({ role }) {
+    const { celebrate } = useCelebration();
     const [projects, setProjects] = useState([]);
     const [clients, setClients] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -210,6 +212,7 @@ export default function ProjectList({ role }) {
             }
 
             toast.success("Project created");
+            celebrate();
             setShowNewDialog(false);
             setNewFile(null);
             setNewFileTempPath(null);

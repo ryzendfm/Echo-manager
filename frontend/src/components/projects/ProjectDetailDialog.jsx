@@ -264,7 +264,7 @@ export default function ProjectDetailDialog({ projectId, open, onClose }) {
                             </div>
 
                             {/* Scrollable body */}
-                            <div className="flex-1 overflow-y-auto no-scrollbar px-5 sm:px-6 py-5 sm:py-5 space-y-6 sm:space-y-5">
+                            <div className="flex-1 overflow-y-auto styled-scrollbar px-5 sm:px-6 py-5 sm:py-5 space-y-6 sm:space-y-5">
 
                                 {/* Description */}
                                 {project.description && (
